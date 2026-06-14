@@ -25,7 +25,7 @@
     .container {
         max-width: 500px;
         width: 100%;
-        background: #CCCCCC;
+        background: white;
         border-radius: 20px;
         box-shadow: 0 20px 60px rgba(207, 143, 1, 0.3);
         overflow: hidden;
@@ -52,7 +52,7 @@
 
     .header h1 {
         font-size: 28px;
-        font-weight: 900;
+        font-weight: 700;
         margin-bottom: 10px;
         display: flex;
         align-items: center;
@@ -63,7 +63,7 @@
     .header p {
         font-size: 14px;
         opacity: 0.9;
-        font-weight: 700;
+        font-weight: 300;
     }
 
     .content {
@@ -94,7 +94,7 @@
         border-radius: 8px;
         margin: 20px 0;
         font-size: 14px;
-        font-weight: 700;
+        font-weight: 500;
         min-height: 60px;
         display: flex;
         align-items: center;
@@ -139,7 +139,7 @@
         flex: 1;
         padding: 16px 24px;
         font-size: 16px;
-        font-weight: 900;
+        font-weight: 600;
         border: none;
         border-radius: 10px;
         cursor: pointer;
@@ -183,14 +183,12 @@
         color: #666;
         border: 1px solid #ffe082;
         line-height: 1.6;
-        font-weight: 700;
     }
 
     .instructions strong {
         color: #CF8F1;
         display: block;
         margin-top: 8px;
-        font-weight: 900;
     }
 
     .footer {
@@ -200,7 +198,6 @@
         font-size: 12px;
         background: #fafafa;
         border-top: 1px solid #eee;
-        font-weight: 700;
     }
 
     canvas {
@@ -227,8 +224,8 @@
 
 <div class="container">
     <div class="header">
-        <h1>Sácale foto a tu protobard</h1>
-        <p>¡Hazlo desde arriba para ver mejor los componentes!</p>
+        <h1><span class="icon">📸</span> Captura tu Momento</h1>
+        <p>Toma una foto para continuar</p>
     </div>
 
     <div class="content">
@@ -238,24 +235,25 @@
 
         <div class="status-box">
             <div id="status" class="loading">
-                Activando cámara...
+                <span class="icon">⏳</span> Activando cámara...
             </div>
         </div>
 
         <div class="button-container">
             <button id="capture" disabled>
-                Tomar Foto
+                <span class="icon">📷</span> Tomar Foto
             </button>
         </div>
 
         <div class="instructions" id="instructions" style="display:none;">
-            <strong>Permiso requerido:</strong>
+            <strong>⚠️ Permiso requerido:</strong>
             Activa los permisos de cámara en tu teléfono:
             <br>Configuración → Aplicaciones → Brave → Permisos → Cámara
         </div>
     </div>
 
     <div class="footer">
+        ✨ Crea tu experiencia visual
     </div>
 </div>
 
@@ -283,14 +281,14 @@ async function iniciarCamara() {
         video.srcObject = stream;
         
         status.className = "success";
-        status.innerHTML = '¡Cámara lista! Toca el botón para capturar';
+        status.innerHTML = '<span class="icon">✅</span> ¡Cámara lista! Toca el botón para capturar';
         captureBtn.disabled = false;
         instructions.style.display = "none";
     } catch (error) {
         console.error("Error:", error);
         
         status.className = "";
-        status.innerHTML = `${error.message}`;
+        status.innerHTML = `<span class="icon">❌</span> ${error.message}`;
         captureBtn.disabled = true;
         instructions.style.display = "block";
     }
@@ -299,7 +297,7 @@ async function iniciarCamara() {
 // Capturar foto
 captureBtn.addEventListener("click", () => {
     if (!video.srcObject) {
-        status.innerHTML = 'La cámara no está lista';
+        status.innerHTML = '<span class="icon">⚠️</span> La cámara no está lista';
         return;
     }
 
@@ -311,7 +309,7 @@ captureBtn.addEventListener("click", () => {
     ctx.drawImage(video, 0, 0);
 
     status.className = "loading";
-    status.innerHTML = '¡Foto capturada! Redirigiendo...';
+    status.innerHTML = '<span class="icon">📸</span> ¡Foto capturada! Redirigiendo...';
     captureBtn.disabled = true;
 
     // Redirigir después de 2 segundos
