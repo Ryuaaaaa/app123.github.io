@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Permissions-Policy" content="camera=*">
+<title>Tomar Foto</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #CF8F1 0%, #e6a61a 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 500px;
+        width: 100%;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(207, 143, 1, 0.3);
+        overflow: hidden;
+        animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .header {
+        background: linear-gradient(135deg, #CF8F1 0%, #e6a61a 100%);
+        padding: 30px 20px;
+        text-align: center;
+        color: white;
+    }
+
+    .header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .header p {
+        font-size: 14px;
+        opacity: 0.9;
+        font-weight: 300;
+    }
+
+    .content {
+        padding: 30px 20px;
+    }
+
+    .camera-wrapper {
+        position: relative;
+        margin: 20px 0;
+        border-radius: 15px;
+        overflow: hidden;
+        border: 3px solid #CF8F1;
+        box-shadow: 0 10px 30px rgba(207, 143, 1, 0.2);
+    }
+
+    video {
+        width: 100%;
+        height: auto;
+        display: block;
+        background: #000;
+        border-radius: 12px;
+    }
+
+    .status-box {
+        background: #f0f0f0;
+        border-left: 4px solid #CF8F1;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        font-size: 14px;
+        font-weight: 500;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.7;
+        }
+    }
+
+    #status {
+        color: #d32f2f;
+        font-weight: bold;
+    }
+
+    #status.success {
+        color: #388e3c;
+        border-left-color: #388e3c;
+        background: #e8f5e9;
+    }
+
+    #status.loading {
+        color: #f57c00;
+        border-left-color: #f57c00;
+        background: #fff3e0;
+    }
+
+    .button-container {
+        display: flex;
+        gap: 10px;
+        margin-top: 25px;
+    }
+
+    button {
+        flex: 1;
+        padding: 16px 24px;
+        font-size: 16px;
+        font-weight: 600;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    #capture {
+        background: linear-gradient(135deg, #CF8F1 0%, #e6a61a 100%);
+        color: white;
+        box-shadow: 0 8px 20px rgba(207, 143, 1, 0.3);
+    }
+
+    #capture:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(207, 143, 1, 0.4);
+    }
+
+    #capture:active:not(:disabled) {
+        transform: translateY(-1px);
+    }
+
+    #capture:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .icon {
+        font-size: 24px;
+        display: inline-block;
+    }
+
+    .instructions {
+        background: #fff9e6;
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 20px;
+        font-size: 13px;
+        color: #666;
+        border: 1px solid #ffe082;
+        line-height: 1.6;
+    }
+
+    .instructions strong {
+        color: #CF8F1;
+        display: block;
+        margin-top: 8px;
+    }
+
+    .footer {
+        text-align: center;
+        padding: 15px;
+        color: #999;
+        font-size: 12px;
+        background: #fafafa;
+        border-top: 1px solid #eee;
+    }
+
+    canvas {
+        display: none;
+    }
+
+    @media (max-width: 480px) {
+        .header h1 {
+            font-size: 24px;
+        }
+        
+        button {
+            padding: 14px 20px;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 20px 15px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1><span class="icon">📸</span> Captura tu Momento</h1>
+        <p>Toma una foto para continuar</p>
+    </div>
+
+    <div class="content">
+        <div class="camera-wrapper">
+            <video id="video" autoplay playsinline muted></video>
+        </div>
+
+        <div class="status-box">
+            <div id="status" class="loading">
+                <span class="icon">⏳</span> Activando cámara...
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button id="capture" disabled>
+                <span class="icon">📷</span> Tomar Foto
+            </button>
+        </div>
+
+        <div class="instructions" id="instructions" style="display:none;">
+            <strong>⚠️ Permiso requerido:</strong>
+            Activa los permisos de cámara en tu teléfono:
+            <br>Configuración → Aplicaciones → Brave → Permisos → Cámara
+        </div>
+    </div>
+
+    <div class="footer">
+        ✨ Crea tu experiencia visual
+    </div>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const video = document.getElementById("video");
+const status = document.getElementById("status");
+const captureBtn = document.getElementById("capture");
+const instructions = document.getElementById("instructions");
+
+// Solicitar acceso a la cámara
+async function iniciarCamara() {
+    try {
+        const constraints = {
+            video: { 
+                facingMode: "environment",
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            },
+            audio: false
+        };
+        
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+        
+        status.className = "success";
+        status.innerHTML = '<span class="icon">✅</span> ¡Cámara lista! Toca el botón para capturar';
+        captureBtn.disabled = false;
+        instructions.style.display = "none";
+    } catch (error) {
+        console.error("Error:", error);
+        
+        status.className = "";
+        status.innerHTML = `<span class="icon">❌</span> ${error.message}`;
+        captureBtn.disabled = true;
+        instructions.style.display = "block";
+    }
+}
+
+// Capturar foto
+captureBtn.addEventListener("click", () => {
+    if (!video.srcObject) {
+        status.innerHTML = '<span class="icon">⚠️</span> La cámara no está lista';
+        return;
+    }
+
+    const canvas = document.getElementById("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0);
+
+    status.className = "loading";
+    status.innerHTML = '<span class="icon">📸</span> ¡Foto capturada! Redirigiendo...';
+    captureBtn.disabled = true;
+
+    // Redirigir después de 2 segundos
+    setTimeout(() => {
+        window.location.href = "https://www.tinkercad.com/things/6kTj2NxoIac-dazzling-leelo-jarv/editel?returnTo=https%3A%2F%2Fwww.tinkercad.com%2Fdashboard";
+    }, 2000);
+});
+
+// Iniciar cámara al cargar
+window.addEventListener("load", iniciarCamara);
+</script>
+
+</body>
+</html>
